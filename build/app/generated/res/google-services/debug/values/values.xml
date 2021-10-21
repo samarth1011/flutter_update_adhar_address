@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">335864513671-0jn4bcvimc7mt4ckbkfmgn3422esnlc3.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">335864513671</string>
+    <string name="google_api_key" translatable="false">AIzaSyBYfizprNt3PVoXkEKwXOuUc6_hFZXXsuE</string>
+    <string name="google_app_id" translatable="false">1:335864513671:android:7beee374dcceaa43a72422</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBYfizprNt3PVoXkEKwXOuUc6_hFZXXsuE</string>
+    <string name="google_storage_bucket" translatable="false">update-adhar-address.appspot.com</string>
+    <string name="project_id" translatable="false">update-adhar-address</string>
+</resources>
