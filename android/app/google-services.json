@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "335864513671",
+    "project_id": "update-adhar-address",
+    "storage_bucket": "update-adhar-address.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335864513671:android:7beee374dcceaa43a72422",
+        "android_client_info": {
+          "package_name": "com.example.flutter_update_adhar_address"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "335864513671-2jri90921qdfv76lct6orbd4d3a7817r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutter_update_adhar_address",
+            "certificate_hash": "678cef87406384fdc63affe451486da3e0cf97c1"
+          }
+        },
+        {
+          "client_id": "335864513671-0jn4bcvimc7mt4ckbkfmgn3422esnlc3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYfizprNt3PVoXkEKwXOuUc6_hFZXXsuE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "335864513671-0jn4bcvimc7mt4ckbkfmgn3422esnlc3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
