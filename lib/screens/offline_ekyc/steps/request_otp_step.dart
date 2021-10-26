@@ -51,7 +51,7 @@ class RequestOtpStepScreen extends StatelessWidget {
           const SizedBox(height: 8),
           _buildAadharInputField(context),
           const SizedBox(height: 8),
-          //_loadCaptcha(context),
+          _loadCaptcha(context),
           const SizedBox(height: 8),
           _buildCaptchaInputField(context),
           const SizedBox(height: 8),
@@ -146,6 +146,9 @@ class RequestOtpStepScreen extends StatelessWidget {
     final captchaAns = _captchaInputController.text;
     final otpRequest = await AadharApi.validateCaptchAndRequestOtp(
         captcha: captcha!, captchValue: captchaAns, aadhaarUid: aadhaarUid);
+    if (otpRequest.status == false) {
+      throw otpRequest.message;
+    }
     showSimpleMessageSnackbar(
         context, 'OTP sent to the given aadhaar registered phone number');
     await Navigator.of(context).push(
