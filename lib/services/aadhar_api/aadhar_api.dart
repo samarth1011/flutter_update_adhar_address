@@ -39,7 +39,7 @@ class AadharApi {
 
   /// Validates the captcha value and requests otp
   static Future<OtpRequest> validateCaptchAndRequestOtp({
-    required Captcha captch,
+    required Captcha captcha,
     required String captchValue,
     required String aadhaarUid,
   }) async {
@@ -48,7 +48,7 @@ class AadharApi {
     final uri = Uri.parse(urlFormatted);
     final body = <String, dynamic>{
       "uidNumber": aadhaarUid,
-      "captchaTxnId": captch.captchaTranscationId,
+      "captchaTxnId": captcha.captchaTranscationId,
       "captchaValue": captchValue,
       "transactionId": "MYAADHAAR:$uuid"
     };
