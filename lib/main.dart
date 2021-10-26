@@ -1,10 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_update_adhar_address/data_models.dart/otp_request.dart';
 import 'package:flutter_update_adhar_address/screens/edit_address.dart';
 import 'package:flutter_update_adhar_address/screens/home_page.dart';
 import 'package:flutter_update_adhar_address/screens/land_lord_home.dart';
 import 'package:flutter_update_adhar_address/screens/login_page.dart';
-import 'package:flutter_update_adhar_address/screens/offline_ekyc/captcha_screen.dart';
+import 'package:flutter_update_adhar_address/screens/offline_ekyc/steps/request_otp_step.dart';
+import 'package:flutter_update_adhar_address/screens/offline_ekyc/steps/validate_otp_step.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: CaptchaScreen(),
+      home: RequestOtpStepScreen(),
       routes: {
         'homePage': (context) => HomePage(),
         'LoginPage': (context) => SignupPage(),

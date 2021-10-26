@@ -3,27 +3,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_update_adhar_address/data_models.dart/captcha.dart';
 import 'package:flutter_update_adhar_address/data_models.dart/otp_request.dart';
+import 'package:flutter_update_adhar_address/screens/offline_ekyc/steps/validate_otp_step.dart';
 import 'package:flutter_update_adhar_address/services/aadhar_api/aadhar_api.dart';
 import 'package:flutter_update_adhar_address/utils/ui_utils.dart';
 
 typedef OnUidCaptchaVerifiedCallback = Future<void> Function(
     BuildContext context, OtpRequest otpRequest);
 
-class RequestOtpStep extends StatelessWidget {
-  RequestOtpStep({Key? key, required this.onUidAndCaptchaVerified})
-      : super(key: key);
+class RequestOtpStepScreen extends StatelessWidget {
+  RequestOtpStepScreen({
+    Key? key,
+  }) : super(key: key);
 
   final _captchFormKey = GlobalKey<FormState>();
   final _uidInputController = TextEditingController();
   final _captchaInputController = TextEditingController();
 
-  final OnUidCaptchaVerifiedCallback onUidAndCaptchaVerified;
-
   Captcha? captcha;
 
   @override
   Widget build(BuildContext context) {
-    return _buildUidAndCaptchaForm(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Offline eKYC: Request OTP',
+        ),
+      ),
+      body: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            children: [
+              _buildUidAndCaptchaForm(context),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildUidAndCaptchaForm(BuildContext context) {
@@ -38,26 +55,32 @@ class RequestOtpStep extends StatelessWidget {
           const SizedBox(height: 8),
           _buildCaptchaInputField(context),
           const SizedBox(height: 8),
+          _buildSubmitButton(context),
+          const SizedBox(height: 8),
         ],
       ),
     );
   }
 
-  /* Widget _buildSubmitButton(BuildContext context) {
+  Widget _buildSubmitButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () async {
-        await onFormSubmit(context);
+        try {
+          await onFormSubmit(context);
+        } catch (e) {
+          showSimpleMessageSnackbar(context, e.toString());
+        }
       },
       child: const Text(
         'Submit',
       ),
     );
-  } */
+  }
 
   Widget _buildCaptchaInputField(BuildContext context) {
     return TextFormField(
       controller: _captchaInputController,
-      keyboardType: TextInputType.number,
+      keyboardType: TextInputType.text,
       validator: (text) {
         final uidInput = text ?? '';
         if (uidInput.isEmpty) {
@@ -123,6 +146,14 @@ class RequestOtpStep extends StatelessWidget {
     final captchaAns = _captchaInputController.text;
     final otpRequest = await AadharApi.validateCaptchAndRequestOtp(
         captcha: captcha!, captchValue: captchaAns, aadhaarUid: aadhaarUid);
-    await onUidAndCaptchaVerified(context, otpRequest);
+    showSimpleMessageSnackbar(
+        context, 'OTP sent to the given aadhaar registered phone number');
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ValidateOtpStepScreen(
+          otpRequest: otpRequest,
+        ),
+      ),
+    );
   }
 }

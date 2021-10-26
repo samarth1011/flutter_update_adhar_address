@@ -65,15 +65,14 @@ class AadharApi {
       headers: headers,
     );
     if (response.statusCode != 200) {
-      throw Exception(
-          '$urlFormatted returned with status code ${response.statusCode}');
+      throw '$urlFormatted returned with status code ${response.statusCode}';
     }
     final responseBody = response.body;
     final responseBodyDecodded = jsonDecode(responseBody);
     return OtpRequest(responseBodyDecodded);
   }
 
-  Future<EKYC?> getOfflineEKYC(
+  static Future<EKYC> getOfflineEKYC(
       {required String aadhaarUid,
       required String transcationNumber,
       required String otp,
