@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const CaptchaScreen(),
+      home: CaptchaScreen(),
       routes: {
         'homePage': (context) => HomePage(),
         'LoginPage': (context) => SignupPage(),
