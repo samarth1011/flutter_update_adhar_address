@@ -37,7 +37,6 @@ class RequestOtpStep extends StatelessWidget {
           //_loadCaptcha(context),
           const SizedBox(height: 8),
           _buildCaptchaInputField(context),
-
           const SizedBox(height: 8),
         ],
       ),

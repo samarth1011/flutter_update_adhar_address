@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_update_adhar_address/data_models.dart/captcha.dart';
+import 'package:flutter_update_adhar_address/data_models.dart/e_kyc.dart';
 import 'package:flutter_update_adhar_address/data_models.dart/otp_request.dart';
 import 'package:flutter_update_adhar_address/utils/util_functions.dart';
 import 'package:http/http.dart' as http;
@@ -70,5 +71,36 @@ class AadharApi {
     final responseBody = response.body;
     final responseBodyDecodded = jsonDecode(responseBody);
     return OtpRequest(responseBodyDecodded);
+  }
+
+  Future<EKYC?> getOfflineEKYC(
+      {required String aadhaarUid,
+      required String transcationNumber,
+      required String otp,
+      String shareCode = '4567'}) async {
+    const urlFormatted =
+        'https://stage1.uidai.gov.in/eAadhaarService/api/downloadOfflineEkyc';
+    final uri = Uri.parse(urlFormatted);
+    final body = <String, dynamic>{
+      "txnNumber": transcationNumber,
+      "otp": otp,
+      "shareCode": shareCode,
+      "uid": aadhaarUid,
+    };
+    final headers = <String, String>{
+      'Content-Type': 'application/json',
+    };
+    final response = await http.post(
+      uri,
+      body: jsonEncode(body),
+      headers: headers,
+    );
+    if (response.statusCode != 200) {
+      throw Exception(
+          '$urlFormatted returned with status code ${response.statusCode}');
+    }
+    final responseBody = response.body;
+    final responseBodyDecodded = jsonDecode(responseBody);
+    return EKYC(responseBodyDecodded);
   }
 }
