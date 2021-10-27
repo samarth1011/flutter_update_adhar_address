@@ -6,16 +6,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_glow/flutter_glow.dart';
-import 'package:flutter_update_adhar_address/services/dynamic_links.dart';
-import 'package:flutter_update_adhar_address/services/geocoding.dart';
-import 'package:flutter_update_adhar_address/services/google_auth_api.dart';
+import 'package:flutter_update_adhar_address/screens/offline_ekyc/steps/request_otp_step.dart';
+import 'package:flutter_update_adhar_address/services/firebase_auth_api/auth_service.dart';
 import 'package:flutter_update_adhar_address/services/user_consent_details.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
+import 'home_drawer.dart';
+
 class HomePage extends StatefulWidget {
-  HomePage({Key? key}) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -35,7 +36,7 @@ class _HomePageState extends State<HomePage> {
     initDynamicLinks();
   }
 
-  dynamic FirebaseUsersData = {};
+  dynamic firebaseUsersData = {};
   dynamic dataFromRoute = {};
   // Retrieve Dynamic
 
@@ -55,11 +56,11 @@ class _HomePageState extends State<HomePage> {
 
     // Send Email
 
-    SendEmail(landLordEmail, accessToken, displayName);
+    sendEmail(landLordEmail, accessToken, displayName);
     print("Mail Sent");
   }
 
-  Future SendEmail(landLordEmail, accessToken, displayName) async {
+  Future sendEmail(landLordEmail, accessToken, displayName) async {
     setState(() {
       isMailSending:
       true;
@@ -203,9 +204,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final dataFromRoute = ModalRoute.of(context)!.settings.arguments as Map;
-    FirebaseUsersData = {
-      'Name': dataFromRoute['userName'],
+    //final dataFromRoute = ModalRoute.of(context)!.settings.arguments as Map;
+    firebaseUsersData = {
+      'Name': AuthService.instance.currentUserName,
       'isConsentGiven': false,
       'isConsentRequested': false,
       'isConsentWaitingForConfirmation': false,
@@ -225,7 +226,7 @@ class _HomePageState extends State<HomePage> {
               .doc(FirebaseAuth.instance.currentUser!.uid)
               .collection('users')
               .doc('${dataFromRoute['userName']}')
-              .set(FirebaseUsersData)
+              .set(firebaseUsersData)
           : print("No data set");
       // exists : // does not exist ;
     });
@@ -234,6 +235,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text('Update Aadhar'),
       ),
+      drawer: const HomeDrawer(),
       body: Center(
         child: StreamBuilder(
             stream: FirebaseFirestore.instance
@@ -295,57 +297,53 @@ class _HomePageState extends State<HomePage> {
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
-                                      return Expanded(
-                                        child: AlertDialog(
-                                          title:
-                                              Text('LandLoard Aadhar Number'),
-                                          content: Column(
-                                            children: [
-                                              Text(
-                                                  "---------------------Some Info Here------------------"),
-                                              SizedBox(
-                                                height: 20,
-                                              ),
-                                              TextField(
-                                                // inputFormatters: <TextInputFormatter>[
-                                                //   FilteringTextInputFormatter.allow(RegExp(
-                                                //       r'^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$')),
-                                                // ],
-                                                controller:
-                                                    aadharNumberController,
-                                                keyboardType:
-                                                    TextInputType.number,
-                                                decoration: InputDecoration(
-                                                    hintText:
-                                                        'LandLord Aadhar Number',
-                                                    prefixIcon:
-                                                        Icon(Icons.person)),
-                                              )
-                                            ],
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              // : Colors.black,
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: Text('CANCEL'),
+                                      return AlertDialog(
+                                        title: Text('LandLoard Aadhar Number'),
+                                        content: Column(
+                                          children: [
+                                            Text(
+                                                "---------------------Some Info Here------------------"),
+                                            SizedBox(
+                                              height: 20,
                                             ),
-                                            ElevatedButton(
-                                              // textColor: Colors.black,
-                                              onPressed: () {
-                                                sendRequest(
-                                                    aadharNumberController.text,
-                                                    dataFromRoute[
-                                                        'accessToken'],
-                                                    dataFromRoute['userName']);
-
-                                                Navigator.pop(context);
-                                              },
-                                              child: Text('Send Request'),
-                                            ),
+                                            TextField(
+                                              // inputFormatters: <TextInputFormatter>[
+                                              //   FilteringTextInputFormatter.allow(RegExp(
+                                              //       r'^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$')),
+                                              // ],
+                                              controller:
+                                                  aadharNumberController,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              decoration: InputDecoration(
+                                                  hintText:
+                                                      'LandLord Aadhar Number',
+                                                  prefixIcon:
+                                                      Icon(Icons.person)),
+                                            )
                                           ],
                                         ),
+                                        actions: [
+                                          TextButton(
+                                            // : Colors.black,
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text('CANCEL'),
+                                          ),
+                                          ElevatedButton(
+                                            // textColor: Colors.black,
+                                            onPressed: () {
+                                              sendRequest(
+                                                  aadharNumberController.text,
+                                                  dataFromRoute['accessToken'],
+                                                  dataFromRoute['userName']);
+
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text('Send Request'),
+                                          ),
+                                        ],
                                       );
                                     },
                                   );
