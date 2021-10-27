@@ -12,12 +12,13 @@ String generateUuidV4() {
 
 Future<File> createFileFromBase64EncoddedString(String base64EncoddedString,
     {required String filename, required String fileExtension}) async {
+  print('BASE 64: $base64EncoddedString');
   Uint8List bytes = base64Decode(base64EncoddedString);
-  String dir = (await getApplicationDocumentsDirectory()).path;
-  File file = File('$dir/${filename}_' +
-      DateTime.now().millisecondsSinceEpoch.toString() +
-      ".$fileExtension");
-  await file.writeAsBytes(bytes);
+  final docsDirectory = await getApplicationDocumentsDirectory();
+  String dir = (docsDirectory).path;
+  File file = File('$dir/$filename');
+  await file.create();
+  await file.writeAsBytes(bytes, flush: true);
   return file;
 }
 

@@ -3,7 +3,7 @@ class OtpRequest {
   OtpRequest(this.json);
 
   String get uidNumber {
-    return json['uidNumber'];
+    return json['uidNumber'].toString();
   }
 
   String get mobileNumber {

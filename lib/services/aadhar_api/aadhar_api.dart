@@ -89,17 +89,28 @@ class AadharApi {
     final headers = <String, String>{
       'Content-Type': 'application/json',
     };
-    final response = await http.post(
-      uri,
-      body: jsonEncode(body),
-      headers: headers,
-    );
+    var response;
+    try {
+      response = await http.post(
+        uri,
+        body: jsonEncode(body),
+        headers: headers,
+      );
+    } catch (e) {
+      print('ERROR while requesting $urlFormatted: $e');
+    }
     if (response.statusCode != 200) {
       throw Exception(
           '$urlFormatted returned with status code ${response.statusCode}');
     }
     final responseBody = response.body;
     final responseBodyDecodded = jsonDecode(responseBody);
+    final bodyStatusCode = responseBodyDecodded['status'];
+    if (bodyStatusCode is num) {
+      if (bodyStatusCode >= 400 && bodyStatusCode < 500) {
+        throw responseBodyDecodded['errorDetails']['messageEnglish'];
+      }
+    }
     return EKYC(responseBodyDecodded);
   }
 }
