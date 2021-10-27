@@ -403,27 +403,12 @@ class _HomePageState extends State<HomePage> {
                                     },
                                   );
                                 },
-                                icon: Icon(Icons.logout),
-                                label: Text("Edit Address"))
-                            : SizedBox(height: 10),
-                        SizedBox(
+                                icon: const Icon(Icons.logout),
+                                label: const Text("Edit Address"))
+                            : const SizedBox(height: 10),
+                        const SizedBox(
                           height: 30,
                         ),
-                        ElevatedButton.icon(
-                            onPressed: () {
-                              FirebaseAuth.instance
-                                  .signOut()
-                                  .then((value) => {
-                                        print("Signed out"),
-                                        Navigator.pushReplacementNamed(
-                                            context, 'LoginPage')
-                                      })
-                                  .catchError((e) {
-                                print(e);
-                              });
-                            },
-                            icon: Icon(Icons.logout),
-                            label: Text("Logout"))
                       ],
                     ),
                   );
