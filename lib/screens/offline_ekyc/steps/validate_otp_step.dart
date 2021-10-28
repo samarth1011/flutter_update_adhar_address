@@ -71,7 +71,13 @@ class ValidateOtpStepScreen extends StatelessWidget {
     // convert the ekyc to downloadable file
     final file = await createFileFromBase64EncoddedString(ekyc.eKycXMLBase64,
         filename: ekyc.filename, fileExtension: 'zip');
-    showSimpleMessageSnackbar(context, 'eKYC file downloaded at ${file.path}');
+    final fileCreated = await file.exists();
+    if (fileCreated) {
+      showSimpleMessageSnackbar(
+          context, 'eKYC file downloaded at ${file.path}');
+    } else {
+      showSimpleMessageSnackbar(context, 'cannot download eKYC file');
+    }
   }
 
   Widget _buildOtpInputForm(BuildContext context) {
