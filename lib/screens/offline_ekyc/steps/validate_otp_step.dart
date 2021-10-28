@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_update_adhar_address/data_models.dart/otp_request.dart';
 import 'package:flutter_update_adhar_address/services/aadhar_api/aadhar_api.dart';
 import 'package:flutter_update_adhar_address/utils/ui_utils.dart';
 import 'package:flutter_update_adhar_address/utils/util_functions.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ValidateOtpStepScreen extends StatelessWidget {
   ValidateOtpStepScreen({Key? key, this.otpRequest}) : super(key: key);
@@ -72,6 +76,38 @@ class ValidateOtpStepScreen extends StatelessWidget {
     final file = await createFileFromBase64EncoddedString(ekyc.eKycXMLBase64,
         filename: ekyc.filename, fileExtension: 'zip');
     showSimpleMessageSnackbar(context, 'eKYC file downloaded at ${file.path}');
+    downloadFile();
+    saveFile();
+  }
+
+  downloadFile() async {}
+
+  Future<bool> saveFile() async {
+    Directory directory;
+    try {
+      if (Platform.isAndroid) {
+        if (await requestPermission(Permission.storage)) {
+          directory = (await getExternalStorageDirectory())!;
+          print(directory.path);
+        } else {
+          return false;
+        }
+      } else {}
+    } catch (e) {}
+    return false;
+  }
+
+  Future<bool> requestPermission(Permission permission) async {
+    if (await permission.isGranted) {
+      return true;
+    } else {
+      var result = await permission.request();
+      if (result == PermissionStatus.granted) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 
   Widget _buildOtpInputForm(BuildContext context) {
