@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_update_adhar_address/data_models.dart/otp_request.dart';
 import 'package:flutter_update_adhar_address/services/aadhar_api/aadhar_api.dart';
@@ -16,6 +17,7 @@ class ValidateOtpStepScreen extends StatelessWidget {
   final _otpInputController = TextEditingController();
 
   final OtpRequest? otpRequest;
+  final Dio dio = Dio();
 
   @override
   Widget build(BuildContext context) {
@@ -89,8 +91,31 @@ class ValidateOtpStepScreen extends StatelessWidget {
         if (await requestPermission(Permission.storage)) {
           directory = (await getExternalStorageDirectory())!;
           print(directory.path);
+          String newPath = "";
+          List<String> folders = directory.path.split('/');
+          for (int x = 1; x < folders.length; x++) {
+            String folder = folders[x];
+            if (folder != "Android") {
+              newPath += "/" + folder;
+            } else {
+              break;
+            }
+          }
+          newPath = newPath += "/ZALA_DOWNLOAD";
+          directory = Directory(newPath);
+          print(directory.path);
         } else {
           return false;
+        }
+        if (!await directory.exists()) {
+          await directory.create(recursive: true);
+        }
+        if (await directory.exists()) {
+          File saveFile = File(directory.path + "/aadhaar_address");
+          // await dio.download(
+          //   url,
+          //   saveFile.path,
+          // );
         }
       } else {}
     } catch (e) {}
