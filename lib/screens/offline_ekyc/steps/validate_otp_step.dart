@@ -1,8 +1,13 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_update_adhar_address/data_models.dart/otp_request.dart';
 import 'package:flutter_update_adhar_address/services/aadhar_api/aadhar_api.dart';
 import 'package:flutter_update_adhar_address/utils/ui_utils.dart';
 import 'package:flutter_update_adhar_address/utils/util_functions.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ValidateOtpStepScreen extends StatelessWidget {
   ValidateOtpStepScreen({Key? key, this.otpRequest}) : super(key: key);
@@ -12,6 +17,7 @@ class ValidateOtpStepScreen extends StatelessWidget {
   final _otpInputController = TextEditingController();
 
   final OtpRequest? otpRequest;
+  final Dio dio = Dio();
 
   @override
   Widget build(BuildContext context) {
@@ -71,12 +77,61 @@ class ValidateOtpStepScreen extends StatelessWidget {
     // convert the ekyc to downloadable file
     final file = await createFileFromBase64EncoddedString(ekyc.eKycXMLBase64,
         filename: ekyc.filename, fileExtension: 'zip');
-    final fileCreated = await file.exists();
-    if (fileCreated) {
-      showSimpleMessageSnackbar(
-          context, 'eKYC file downloaded at ${file.path}');
+    showSimpleMessageSnackbar(context, 'eKYC file downloaded at ${file.path}');
+    downloadFile();
+    await saveFile();
+  }
+
+  downloadFile() async {}
+
+  Future<bool> saveFile() async {
+    Directory directory;
+    try {
+      if (Platform.isAndroid) {
+        if (await requestPermission(Permission.storage)) {
+          directory = (await getExternalStorageDirectory())!;
+          print(directory.path);
+          String newPath = "";
+          List<String> folders = directory.path.split('/');
+          for (int x = 1; x < folders.length; x++) {
+            String folder = folders[x];
+            if (folder != "Android") {
+              newPath += "/" + folder;
+            } else {
+              break;
+            }
+          }
+          newPath = newPath += "/ZALA_DOWNLOAD";
+          directory = Directory(newPath);
+          print(directory.path);
+        } else {
+          return false;
+        }
+        if (!await directory.exists()) {
+          await directory.create(recursive: true);
+        }
+        if (await directory.exists()) {
+          File saveFile = File(directory.path + "/aadhaar_address");
+          // await dio.download(
+          //   url,
+          //   saveFile.path,
+          // );
+        }
+      } else {}
+    } catch (e) {}
+    return false;
+  }
+
+  Future<bool> requestPermission(Permission permission) async {
+    if (await permission.isGranted) {
+      return true;
     } else {
-      showSimpleMessageSnackbar(context, 'cannot download eKYC file');
+      var result = await permission.request();
+      if (result == PermissionStatus.granted) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 
