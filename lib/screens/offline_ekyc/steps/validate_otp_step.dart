@@ -8,6 +8,8 @@ import 'package:flutter_update_adhar_address/utils/ui_utils.dart';
 import 'package:flutter_update_adhar_address/utils/util_functions.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:open_file/open_file.dart';
+import 'package:flutter_archive/flutter_archive.dart';
 
 class ValidateOtpStepScreen extends StatelessWidget {
   ValidateOtpStepScreen({Key? key, this.otpRequest}) : super(key: key);
@@ -79,6 +81,20 @@ class ValidateOtpStepScreen extends StatelessWidget {
         filename: ekyc.filename, fileExtension: 'zip');
     final fileCreated = await file.exists();
     if (fileCreated) {
+      final zipFile = File("${file.path}");
+      final destinationDir =
+          Directory((await getExternalStorageDirectory())!.path);
+      try {
+        ZipFile.extractToDirectory(
+            zipFile: zipFile, destinationDir: destinationDir);
+        showSimpleMessageSnackbar(
+            context, 'Extracted Files to: $destinationDir');
+          
+        OpenFile.open(destinationDir.toString());
+      } catch (e) {
+        showSimpleMessageSnackbar(
+            context, 'Could not extract the zip file - $e');
+      }
       showSimpleMessageSnackbar(
           context, 'eKYC file downloaded at ${file.path}');
     } else {
