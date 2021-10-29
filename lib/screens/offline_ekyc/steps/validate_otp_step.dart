@@ -76,35 +76,25 @@ class ValidateOtpStepScreen extends StatelessWidget {
       transcationNumber: otpRequest!.transcationId,
       otp: otp,
     );
-    // convert the ekyc to downloadable file
+    // convert the ekyc to file in external storage
     final file = await createFileFromBase64EncoddedString(ekyc.eKycXMLBase64,
         filename: ekyc.filename, fileExtension: 'zip');
+    // see if file is created or not
     final fileCreated = await file.exists();
     if (fileCreated) {
-      final zipFile = File("${file.path}");
-      final destinationDir =
-          Directory((await getExternalStorageDirectory())!.path);
-      try {
-        ZipFile.extractToDirectory(
-            zipFile: zipFile, destinationDir: destinationDir);
-        showSimpleMessageSnackbar(
-            context, 'Extracted Files to: $destinationDir');
-          
-        OpenFile.open(destinationDir.toString());
-      } catch (e) {
-        showSimpleMessageSnackbar(
-            context, 'Could not extract the zip file - $e');
+      // extract the zipped file to external storage
+      final fileExtractedDirectory = await unzipFile(zippedFile: file);
+      // now open the file
+      final fileOpeningResult =
+          await OpenFile.open(fileExtractedDirectory.path);
+      // if the file is not opened correctly, show the error
+      if (fileOpeningResult.type != ResultType.done) {
+        showSimpleMessageSnackbar(context, fileOpeningResult.message);
       }
-      showSimpleMessageSnackbar(
-          context, 'eKYC file downloaded at ${file.path}');
     } else {
       showSimpleMessageSnackbar(context, 'Could not download eKYC file');
     }
   }
-
-  downloadFile() async {}
-
-  Future<void> saveFile() async {}
 
   Future<bool> requestPermission(Permission permission) async {
     if (await permission.isGranted) {
