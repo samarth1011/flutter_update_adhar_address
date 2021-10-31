@@ -52,7 +52,7 @@
 
 Link to video : https://drive.google.com/file/d/1vti-XlqPUIJgOw9onqIINMqVpncvXzRj/view
 
-## Security
+### Security
 
 - The 2 way authentication for aadhaar as well as google is used for both Landlord and user.
 - Password for eKYC is first encoded and then stored to cloud databse i:e firestore by Google.
@@ -65,7 +65,7 @@ Link to video : https://drive.google.com/file/d/1vti-XlqPUIJgOw9onqIINMqVpncvXzR
 After this process the zip file is deleted from  users phone.
 
 
-## Work Yet to be done
+### Work Yet to be done
 
 Show Admin logs on UI currently it is seen on firebase.
 
