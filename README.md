@@ -57,6 +57,13 @@ Link to video : https://drive.google.com/file/d/1vti-XlqPUIJgOw9onqIINMqVpncvXzR
 
 Show Admin logs on UI currently it is seen on firebase.
 
+## Security
+
+- The 2 way authentication for aadhaar as well as google is used for both Landlord and user.
+- Password for eKYC is first encoded and then stored to cloud databse i:e firestore by Google.
+- when adderess is (address sent by landlord) is retrived by user then that address encoded string and password that as stored in databse is deleted.
+- No eKYC file is parmanently stored on device its deleted once address is retrived from file.
+
 
 
 
