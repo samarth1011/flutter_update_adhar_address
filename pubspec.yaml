@@ -27,6 +27,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  archive: ^3.1.6
   cloud_firestore: ^2.5.3
   cupertino_icons: ^1.0.2
   dio: ^4.0.1
@@ -52,6 +53,9 @@ dependencies:
   permission_handler: ^8.2.5
   url_launcher: ^6.0.12
   uuid: ^3.0.5
+  xml: ^5.3.1
+  xml2json: ^5.3.1
+  xml_parser: ^1.0.0
 
 dev_dependencies:
   flutter_lints: ^1.0.0

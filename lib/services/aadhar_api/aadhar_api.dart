@@ -76,7 +76,8 @@ class AadharApi {
       {required String aadhaarUid,
       required String transcationNumber,
       required String otp,
-      String shareCode = '4567'}) async {
+      required String shareCode,
+      }) async {
     const urlFormatted =
         'https://stage1.uidai.gov.in/eAadhaarService/api/downloadOfflineEkyc';
     final uri = Uri.parse(urlFormatted);

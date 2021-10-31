@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_update_adhar_address/data_models.dart/otp_request.dart';
 import 'package:flutter_update_adhar_address/services/aadhar_api/aadhar_api.dart';
 import 'package:flutter_update_adhar_address/services/firebase_auth_api/auth_service.dart';
-import 'package:flutter_update_adhar_address/services/firebase_auth_api/user_credential.dart';
 import 'package:flutter_update_adhar_address/services/received_userd_data.dart';
 import 'package:flutter_update_adhar_address/utils/ui_utils.dart';
 import 'package:flutter_update_adhar_address/utils/util_functions.dart';
@@ -19,8 +18,8 @@ import 'package:flutter_archive/flutter_archive.dart';
 import 'package:xml/xml.dart';
 import 'package:xml2json/xml2json.dart';
 
-class ValidateOtpStepScreen extends StatelessWidget {
-  ValidateOtpStepScreen(
+class ValidateOtpStepScreenOnlyOTP extends StatelessWidget {
+  ValidateOtpStepScreenOnlyOTP(
     this.otpRequest,
   );
 
@@ -58,11 +57,13 @@ class ValidateOtpStepScreen extends StatelessWidget {
   }
 
   Widget _buildSubmitButton(BuildContext context) {
+    TextEditingController passwordController = TextEditingController();
+    passwordController.text = '';
     return ElevatedButton(
       onPressed: () async {
         try {
-          await onFormSubmit(context);
-          showSimpleMessageSnackbar(context, 'Address sent successfully');
+          await onFormSubmit(context, passwordController.text);
+          showSimpleMessageSnackbar(context, 'OTP validated');
           Navigator.pop(context);
           Navigator.pop(context);
         } catch (e) {
@@ -75,9 +76,8 @@ class ValidateOtpStepScreen extends StatelessWidget {
     );
   }
 
-  Future<void> onFormSubmit(BuildContext context) async {
-    var shareCode = receivedUserDataObj.passwordForFile;
-    print("Share code = $shareCode");
+  Future<void> onFormSubmit(
+      BuildContext context, passwordGivenByLandLordForeKYC) async {
     final isFormValid = _otpFormKey.currentState?.validate();
     if (isFormValid == false) {
       throw 'Please fill the form correctly.';
@@ -90,34 +90,8 @@ class ValidateOtpStepScreen extends StatelessWidget {
       aadhaarUid: otpRequest!.uidNumber,
       transcationNumber: otpRequest!.transcationId,
       otp: otp,
-      shareCode: shareCode,
+      shareCode: '4567',
     );
-    // convert the ekyc to downloadable file
-    FirebaseFirestore.instance
-        .collection('Users')
-        .doc(AuthService.instance.currentUser!.uid)
-        .collection('users')
-        .doc(AuthService.instance.currentUserName)
-        .update({
-      "is-address-sent": true,
-      'address-sent-to-firebae-uid':
-          receivedUserDataObj.addressRequesterFirebaseUID,
-      'address-sent-to': receivedUserDataObj.addressRequesterFirebaseUsername,
-      'address-sent-date': DateTime.now(),
-    });
-
-    FirebaseFirestore.instance
-        .collection('Users')
-        .doc(receivedUserDataObj.addressRequesterFirebaseUID)
-        .collection('users')
-        .doc(receivedUserDataObj.addressRequesterFirebaseUsername)
-        .update({
-      'address-received-date': DateTime.now(),
-      'isConsentGiven': true,
-      'isConsentWaitingForConfirmation': false,
-      'offline-eKYC-base64': ekyc.eKycXMLBase64,
-      // 'password-foreKYC-file-given-by-landLord': encryptedP
-    });
   }
 
   Widget _buildOtpInputForm(BuildContext context) {

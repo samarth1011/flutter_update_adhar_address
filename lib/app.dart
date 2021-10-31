@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_update_adhar_address/auth_wrapper.dart';
 import 'package:flutter_update_adhar_address/resources/themes/ui_themes.dart';
+import 'package:flutter_update_adhar_address/screens/offline_ekyc/steps/address_sent_to_user_page.dart';
+
 import 'package:flutter_update_adhar_address/screens/offline_ekyc/steps/request_otp_step.dart';
 
 import 'screens/edit_address.dart';
@@ -23,6 +25,7 @@ class AadhaarAddressUpdateApp extends StatelessWidget {
         'LoginPage': (context) => const LoginPage(),
         'landLord_home': (context) => LandLordHomeView(),
         'edit_address': (context) => EditAddress(),
+        'address_sent_to_user_page': (context) => AdressSentToUserFreomLandLord(),
       },
     );
   }

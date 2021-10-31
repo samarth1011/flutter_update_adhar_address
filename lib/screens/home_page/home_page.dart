@@ -6,9 +6,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_glow/flutter_glow.dart';
+import 'package:flutter_update_adhar_address/screens/offline_ekyc/request_otp_screen_just_opt.dart';
 import 'package:flutter_update_adhar_address/screens/offline_ekyc/steps/request_otp_step.dart';
 import 'package:flutter_update_adhar_address/services/firebase_auth_api/auth_service.dart';
+import 'package:flutter_update_adhar_address/services/firebase_auth_api/user_credential.dart';
+import 'package:flutter_update_adhar_address/services/process_received_address.dart';
+import 'package:flutter_update_adhar_address/services/received_userd_data.dart';
 import 'package:flutter_update_adhar_address/services/user_consent_details.dart';
+import 'package:flutter_update_adhar_address/utils/ui_utils.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -28,11 +34,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    // This method is not here take note of it....
-    // print("getting coordinated....");
-    // LocationHandler().compareAddress(
-    //     landLordAddress: receivedAddress, userEditedAddress: userEditedAddress);
-
     initDynamicLinks();
   }
 
@@ -45,18 +46,22 @@ class _HomePageState extends State<HomePage> {
   UserConsentDetails userConsentDetailsObj = UserConsentDetails();
   // GlobalKey formkey = GlobalKey();
 
-  Future<void> sendRequest(
-      landLordAadharNumber, accessToken, displayName) async {
+  Future<void> sendRequest(landLordEmail) async {
     print("sending requestr");
+    showSimpleMessageSnackbar(context, 'Sending Mail...');
+    var accessToken = userCredentialObj.accessToken;
+    var displayName = AuthService.instance.currentUser!.displayName;
+
+    print("acces tokrn $accessToken ");
     // Fetch Landlord Email and Mobile Number from API by his AadharNumber
     // void getLandLordEmailAndMobile(){}
 
     // Assume/suppose -- Remove this after implementation of above
-    String landLordEmail = 'samarth.mailme@gmail.com';
 
     // Send Email
 
-    sendEmail(landLordEmail, accessToken, displayName);
+    await sendEmail(landLordEmail, accessToken, displayName);
+    showSimpleMessageSnackbar(context, 'Mail Sent');
     print("Mail Sent");
   }
 
@@ -83,9 +88,9 @@ class _HomePageState extends State<HomePage> {
     final message = Message()
       ..from = Address('samarth.mailme@gmail.com', 'Samarth godase')
       ..recipients.add(landLordEmail)
-      ..subject = 'Test Dart Mailer library :: 😀 :: ${DateTime.now()}'
+      ..subject = 'Consent to share your aadhaar address with $displayName'
       ..text =
-          'This is the plain text.\nThi s is link for giving consent : $url.';
+          '$displayName has requested you your aadhaar address\nIf you wish to share your address please click on this link and download update aadhaar address app: $url.';
     // ..html = "<h1>Test</h1>\n<p>Hey! Here's  HTML content $url</p><br><a href="
     //     "><button>Give Consent</button></a>";
 
@@ -171,9 +176,9 @@ class _HomePageState extends State<HomePage> {
       print(code.toString());
       if (code != null) {
         print("*************UID = $code**********");
-        Navigator.pushNamed(context, 'landLord_home', arguments: {
+        Navigator.pushReplacementNamed(context, 'landLord_home', arguments: {
           'UIDReceived': code,
-          'currentUserDisName': currentUserDisName,
+          'address-requester-userName': currentUserDisName,
         });
       }
     }
@@ -204,7 +209,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    //final dataFromRoute = ModalRoute.of(context)!.settings.arguments as Map;
+    // final dataFromRoute = ModalRoute.of(context)!.settings.arguments as Map;
     firebaseUsersData = {
       'Name': AuthService.instance.currentUserName,
       'isConsentGiven': false,
@@ -217,7 +222,7 @@ class _HomePageState extends State<HomePage> {
         .collection('Users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('users')
-        .doc('${dataFromRoute['userName']}')
+        .doc(AuthService.instance.currentUserName)
         .get()
         .then((onValue) {
       (!onValue.exists)
@@ -225,7 +230,7 @@ class _HomePageState extends State<HomePage> {
               .collection('Users')
               .doc(FirebaseAuth.instance.currentUser!.uid)
               .collection('users')
-              .doc('${dataFromRoute['userName']}')
+              .doc(AuthService.instance.currentUserName)
               .set(firebaseUsersData)
           : print("No data set");
       // exists : // does not exist ;
@@ -257,162 +262,203 @@ class _HomePageState extends State<HomePage> {
                 );
               }
 
-              return ListView(
-                children: snapshot.data!.docs.map((document) {
-                  dynamic documentData = document.data();
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        (documentData['isConsentRequested'])
-                            ? (documentData[
-                                        'isConsentWaitingForConfirmation'] &&
-                                    !documentData['isConsentGiven'])
-                                ? Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Card(
-                                      child: ListTile(
-                                          title:
-                                              Text('Address Already requested'),
-                                          subtitle: Text(
-                                              "Date Requested: ${documentData['Consent Requested Date']}"),
-                                          trailing: GlowText(
-                                              "Waiting for Confirmation",
-                                              style: TextStyle(
-                                                  color: Colors.orange))),
-                                    ),
-                                  )
-                                : Card(
-                                    child: ListTile(
-                                      title: Text('View and edit address'),
-                                      subtitle:
-                                          Text("Date Requested: 20 oct 2021"),
-                                      trailing: GlowText("Address Received",
-                                          style:
-                                              TextStyle(color: Colors.green)),
-                                    ),
-                                  )
-                            : ElevatedButton.icon(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text('LandLoard Aadhar Number'),
-                                        content: Column(
-                                          children: [
-                                            Text(
-                                                "---------------------Some Info Here------------------"),
-                                            SizedBox(
-                                              height: 20,
-                                            ),
-                                            TextField(
-                                              // inputFormatters: <TextInputFormatter>[
-                                              //   FilteringTextInputFormatter.allow(RegExp(
-                                              //       r'^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$')),
-                                              // ],
-                                              controller:
-                                                  aadharNumberController,
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              decoration: InputDecoration(
-                                                  hintText:
-                                                      'LandLord Aadhar Number',
-                                                  prefixIcon:
-                                                      Icon(Icons.person)),
-                                            )
-                                          ],
+              return Center(
+                child: ListView(
+                  children: snapshot.data!.docs.map((document) {
+                    dynamic documentData = document.data();
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 100),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            (documentData['isConsentRequested'])
+                                ? (documentData[
+                                            'isConsentWaitingForConfirmation'] &&
+                                        !documentData['isConsentGiven'])
+                                    ? Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Card(
+                                          child: ListTile(
+                                              title: Text(
+                                                  'Address Already requested'),
+                                              subtitle: Text(
+                                                  "Date Requested: ${documentData['Consent Requested Date']}"),
+                                              trailing: GlowText(
+                                                  "Waiting for Confirmation",
+                                                  style: TextStyle(
+                                                      color: Colors.orange))),
                                         ),
-                                        actions: [
-                                          TextButton(
-                                            // : Colors.black,
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: Text('CANCEL'),
-                                          ),
-                                          ElevatedButton(
-                                            // textColor: Colors.black,
-                                            onPressed: () {
-                                              sendRequest(
-                                                  aadharNumberController.text,
-                                                  dataFromRoute['accessToken'],
-                                                  dataFromRoute['userName']);
-
-                                              Navigator.pop(context);
-                                            },
-                                            child: Text('Send Request'),
-                                          ),
-                                        ],
+                                      )
+                                    : Card(
+                                        child: ListTile(
+                                          title: Text('View and edit address'),
+                                          subtitle: Text(
+                                              "Date Requested: 20 oct 2021"),
+                                          trailing: GlowText("Address Received",
+                                              style: TextStyle(
+                                                  color: Colors.green)),
+                                        ),
+                                      )
+                                : ElevatedButton.icon(
+                                    onPressed: () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              RequestOtpStepScreenJustOTP(),
+                                        ),
                                       );
-                                    },
-                                  );
-                                },
-                                icon: Icon(Icons.update),
-                                label: !isMailSending
-                                    ? Text('Request Landlord Address')
-                                    : Text('Sending Mail....'),
-                              ),
-                        SizedBox(height: 30),
-                        documentData['isConsentGiven']
-                            ? ElevatedButton.icon(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return Expanded(
-                                        child: AlertDialog(
-                                          title: Text('LandLoard Address'),
-                                          content: Column(
-                                            children: [
-                                              SizedBox(
-                                                height: 20,
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text('LandLoard Email'),
+                                            content: Column(
+                                              children: [
+                                                Text(
+                                                    "Consent Link about sharing address would be sent to this mail"),
+                                                SizedBox(
+                                                  height: 20,
+                                                ),
+                                                TextField(
+                                                  // inputFormatters: <TextInputFormatter>[
+                                                  //   FilteringTextInputFormatter.allow(RegExp(
+                                                  //       r'^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$')),
+                                                  // ],
+                                                  controller:
+                                                      aadharNumberController,
+
+                                                  decoration: InputDecoration(
+                                                      hintText:
+                                                          'LandLord Email',
+                                                      prefixIcon:
+                                                          Icon(Icons.person)),
+                                                )
+                                              ],
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                // : Colors.black,
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text('CANCEL'),
                                               ),
-                                              Text(receivedAddress),
-                                              Divider(
-                                                thickness: 2,
-                                              ),
-                                              SizedBox(
-                                                height: 5,
+                                              ElevatedButton(
+                                                // textColor: Colors.black,
+                                                onPressed: () {
+                                                  sendRequest(
+                                                    aadharNumberController.text,
+                                                  );
+
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text('Send Request'),
                                               ),
                                             ],
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              // : Colors.black,
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: Text('CANCEL'),
-                                            ),
-                                            ElevatedButton(
-                                              // textColor: Colors.black,
-                                              onPressed: () {
-                                                editAddress();
-
-                                                Navigator.pop(context);
-                                                Navigator.pushNamed(
-                                                    context, 'edit_address');
-                                              },
-                                              child:
-                                                  Text('Edit & Submit Address'),
-                                            ),
-                                          ],
-                                        ),
+                                          );
+                                        },
                                       );
                                     },
-                                  );
-                                },
-                                icon: const Icon(Icons.logout),
-                                label: const Text("Edit Address"))
-                            : const SizedBox(height: 10),
-                        const SizedBox(
-                          height: 30,
+                                    icon: Icon(Icons.update),
+                                    label: !isMailSending
+                                        ? Text('Request Landlord Address')
+                                        : Text('Sending Mail....'),
+                                  ),
+                            SizedBox(height: 30),
+                            documentData['isConsentGiven'] &&
+                                    documentData['offline-eKYC-base64'] != null
+                                ? ElevatedButton.icon(
+                                    onPressed: () async {
+                                      var landLordAddress =
+                                          await ProcessReceivedAddress()
+                                              .getReceivedAddress(
+                                                  context,
+                                                  documentData[
+                                                      'offline-eKYC-base64'],
+                                                  documentData[
+                                                      'password-foreKYC-file-given-by-landLord']);
+                                      if (landLordAddress != null) {
+                                        FirebaseFirestore.instance
+                                            .collection('Users')
+                                            .doc(AuthService
+                                                .instance.currentUser!.uid)
+                                            .collection('users')
+                                            .doc(AuthService
+                                                .instance.currentUserName!)
+                                            .update({
+                                          'offline-eKYC-base64': null,
+                                          'password-foreKYC-file-given-by-landLord':
+                                              null,
+                                        });
+                                      }
+
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Expanded(
+                                            child: AlertDialog(
+                                              title: Text('LandLord Address'),
+                                              content: Column(
+                                                children: [
+                                                  SizedBox(
+                                                    height: 20,
+                                                  ),
+                                                  Text(landLordAddress
+                                                      .toString()),
+                                                  Divider(
+                                                    thickness: 2,
+                                                  ),
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                ],
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  // : Colors.black,
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Text('CANCEL'),
+                                                ),
+                                                ElevatedButton(
+                                                  // textColor: Colors.black,
+                                                  onPressed: () {
+                                                    editAddress();
+
+                                                    receivedUserDataObj
+                                                            .receivedlandLordAddress =
+                                                        landLordAddress;
+                                                    Navigator.pop(context);
+                                                    Navigator.pushNamed(
+                                                      context,
+                                                      'edit_address',
+                                                    );
+                                                  },
+                                                  child: Text(
+                                                      'Edit & Submit Address'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    icon: const Icon(Icons.logout),
+                                    label: const Text("Edit Address"))
+                                : const SizedBox(height: 10),
+                            const SizedBox(
+                              height: 30,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                      ),
+                    );
+                  }).toList(),
+                ),
               );
             }),
       ),

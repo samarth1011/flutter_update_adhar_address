@@ -1,7 +1,10 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:flutter_update_adhar_address/services/firebase_auth_api/user_credential.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+import 'user_credential.dart';
 
 class AuthService {
   // Exception Status Code for FirebaseAuth Exceptions
@@ -49,13 +52,14 @@ class AuthService {
       GoogleSignInAccount googleUser) async {
     // Obtain the auth details from the request
     final googleAuth = await googleUser.authentication;
-
+    userCredentialObj.accessToken = googleAuth.accessToken;
+    userCredentialObj.idToken = googleAuth.idToken;
     // Create a new credential
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
-
+    
     // Once signed in, return the UserCredential
     return await signInWithCredential(credential);
   }

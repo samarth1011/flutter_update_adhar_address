@@ -2,6 +2,9 @@ import 'package:geocoding/geocoding.dart';
 
 class LocationHandler {
   Future<bool> compareAddress({landLordAddress, userEditedAddress}) async {
+    print(landLordAddress);
+
+    print(userEditedAddress);
     try {
       List<Location> landLordAddressLocations =
           await locationFromAddress(landLordAddress);

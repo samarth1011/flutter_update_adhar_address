@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_update_adhar_address/resources/colors/ui_palette.dart';
 import 'package:flutter_update_adhar_address/resources/values/dimens.dart';
+import 'package:flutter_update_adhar_address/screens/admin_screen.dart';
 import 'package:flutter_update_adhar_address/screens/offline_ekyc/steps/request_otp_step.dart';
 import 'package:flutter_update_adhar_address/services/firebase_auth_api/auth_service.dart';
 import 'package:flutter_update_adhar_address/utils/ui_utils.dart';
@@ -34,26 +35,10 @@ class HomeDrawer extends StatelessWidget {
               }
             },
           ),
+          
           ListTile(
             title: Text(
-              'Download File',
-              style: TextStyle(
-                color: UiPalette.textDarkShade(1),
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            onTap: () async {
-              final file = await createFileFromBase64EncoddedString(base,
-                  filename: 'rahul-badgujar-123', fileExtension: 'zip');
-              showSimpleMessageSnackbar(context, 'File saved at: ${file.path}');
-              
-
-            },
-          ),
-          ListTile(
-            title: Text(
-              'Offline eKYC',
+              'User Logs',
               style: TextStyle(
                 color: UiPalette.textDarkShade(1),
                 fontWeight: FontWeight.bold,
@@ -64,7 +49,7 @@ class HomeDrawer extends StatelessWidget {
               await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => RequestOtpStepScreen(),
+                  builder: (_) => UserInformation(),
                 ),
               );
             },

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_update_adhar_address/data_models.dart/captcha.dart';
 import 'package:flutter_update_adhar_address/data_models.dart/otp_request.dart';
+import 'package:flutter_update_adhar_address/screens/offline_ekyc/steps/validate_otp_screen_only_otp.dart';
 import 'package:flutter_update_adhar_address/screens/offline_ekyc/steps/validate_otp_step.dart';
 import 'package:flutter_update_adhar_address/services/aadhar_api/aadhar_api.dart';
 import 'package:flutter_update_adhar_address/utils/ui_utils.dart';
@@ -10,8 +11,8 @@ import 'package:flutter_update_adhar_address/utils/ui_utils.dart';
 typedef OnUidCaptchaVerifiedCallback = Future<void> Function(
     BuildContext context, OtpRequest otpRequest);
 
-class RequestOtpStepScreen extends StatelessWidget {
-  RequestOtpStepScreen({
+class RequestOtpStepScreenJustOTP extends StatelessWidget {
+  RequestOtpStepScreenJustOTP({
     Key? key,
   }) : super(key: key);
 
@@ -153,7 +154,7 @@ class RequestOtpStepScreen extends StatelessWidget {
         context, 'OTP sent to the given aadhaar registered phone number');
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => ValidateOtpStepScreen(
+        builder: (_) => ValidateOtpStepScreenOnlyOTP(
           otpRequest,
         ),
       ),
