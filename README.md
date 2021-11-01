@@ -56,7 +56,7 @@
 Note - plese let me know by which mail the app is going to be tested so that I can add it in test mail list. App will not sign in / register if that mail is not added to test mails list on firestore. As we are sending mail through gmail so app need to be accepted by google then only anyone can signIn even if that mail is not regitred on test mail list.
 
 ### Main Workflow
- - After Authentication when landlord clicks "send Address" the ekyc encoded file string is encrypted and added to person who requested address database with password given by landlord (In encrypted form).
+ - After Authentication when landlord clicks "send Address" the ekyc encoded file string is encrypted and added to address requester database with password given by landlord (In encrypted form).
  - The eKYC file is not downloaded or stored in landlord device.
  - After this in address requester app it would be shown that address is received, edit address button would be shown.
  - when address requester clicks on edit and submit address button the encoded and encrypted eKYC file is decoded and downloaded in address requetser device its accessd with passcode given by landlord through code and then the address is retrievd from file and formatted and then immediately eKKYC file is deleted from his device and then he can edit address
