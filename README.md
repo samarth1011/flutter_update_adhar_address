@@ -51,7 +51,7 @@
 
 
 - Link to video : https://drive.google.com/file/d/1vti-XlqPUIJgOw9onqIINMqVpncvXzRj/view
-- Link to apk: https://drive.google.com/file/d/1Zk0jCSqTBpom6NDc6EggVo6MNzecUS0F/view?usp=sharing
+- Link to apk: https://drive.google.com/drive/folders/1v2si3sMkpguHNV5jPjI_AksoDmUd65Gw?usp=sharing
 
 Note - plese let me know by which mail the app is going to be tested so that I can add it in test mail list. App will not sign in / register if that mail is not added to test mails list on firestore. As we are sending mail through gmail so app need to be accepted by google then only anyone can signIn even if that mail is not regitred on test mail list.
 
